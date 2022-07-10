@@ -1,0 +1,109 @@
+# Client
+
+void str_trim_lf(char *arr, int length)
+{
+    int i;
+    for (i = 0; i < length; i++)
+    { // trim \n
+        if (arr[i] == '\n')
+        {
+            arr[i] = '\0';
+            break;
+        }
+    }
+}
+    printf("Please enter your name: ");
+    fgets(name, 32, stdin);
+    str_trim_lf(name, strlen(name));
+
+    if (strlen(name) > 32 || strlen(name) < 2)
+    {
+        printf("Name must be less than 30 and more than 2 characters.\n");
+        return EXIT_FAILURE;
+    }
+    send(sockfd, name, 32, 0);
+
+    // Welcome Message
+
+# Server
+    if (recv(cli->sockfd, name, 32, 0) <= 0 || strlen(name) < 2 || strlen(name) >= 32 - 1)
+    {
+        printf("Didn't enter the name.\n");
+        leave_flag = 1;
+    }
+    else
+    {
+        strcpy(cli->name, name);
+        sprintf(buff_out, "%s has joined\n", name);
+        printf("%s", buff_out);
+        send_message(buff_out, cli->uid);
+    }
+
+
+# Exit Logic
+    ## Client
+        void catch_ctrl_c_and_exit(int sig)
+            {
+                flag = 1;
+            }
+
+    ## Server
+        while (1)
+    {
+        if (leave_flag)
+        {
+            break;
+        }
+
+        int receive = recv(cli->sockfd, buff_out, BUFFER_SZ, 0);
+        if (receive > 0)
+        {
+            if (strlen(buff_out) > 0)
+            {
+                send_message(buff_out, cli->uid);
+
+                str_trim_lf(buff_out, strlen(buff_out));
+                printf("%s -> %s\n", buff_out, cli->name);
+            }
+        }
+        else if (receive == 0 || strcmp(buff_out, "exit") == 0)
+        {
+            sprintf(buff_out, "%s has left\n", cli->name);
+            printf("%s", buff_out);
+            send_message(buff_out, cli->uid);
+            leave_flag = 1;
+        }
+        else
+        {
+            printf("ERROR: -1\n");
+            leave_flag = 1;
+        }
+
+        bzero(buff_out, BUFFER_SZ);
+    }
+
+# Bind Listen Ignore Pipes
+    /* Ignore pipe signals */
+    signal(SIGPIPE, SIG_IGN);
+
+    if (setsockopt(listenfd, SOL_SOCKET, (SO_REUSEPORT | SO_REUSEADDR), (char *)&option, sizeof(option)) < 0)
+    {
+        perror("ERROR: setsockopt failed");
+        return EXIT_FAILURE;
+    }
+
+    /* Bind */
+    if (bind(listenfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+    {
+        perror("ERROR: Socket binding failed");
+        return EXIT_FAILURE;
+    }
+
+    /* Listen */
+    if (listen(listenfd, 10) < 0)
+    {
+        perror("ERROR: Socket listening failed");
+        return EXIT_FAILURE;
+    }
+
+    printf("=== WELCOME TO THE CHATROOM ===\n");
